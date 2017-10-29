@@ -26,7 +26,6 @@ if (in_array($responseCode, $approvedResponseCodes))
 echo "responseCode is " . $responseCode . "<br/>";
 echo "Corresponding message is " . $responseCodes[$responseCode] . "<br/>";
 echo "responseText is " . $trans->getLastResponseText() . "<br/>";
-?>
-	</body>
-</html>
+echo "confirmation id: " . $trans->getConfirmationID();
+
 ?>

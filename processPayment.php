@@ -17,6 +17,7 @@ class SecurePayTransaction {
 	private $responseDOM;
 	private $lastResponseCode;
 	private $lastResponseText;
+	private $confirmationID;
 	
 	function __construct() {
 		
@@ -200,17 +201,26 @@ class SecurePayTransaction {
 				$responseCode = $response_codes->item(0)->nodeValue;
 				$this->lastResponseCode = $responseCode;
 				$this->lastResponseText = $this->responseDOM->getElementsByTagName('responseText')->item(0)->nodeValue;
+				$this->confirmationID = $this->responseDOM->getElementsByTagName('txnID')->item(0)->nodeValue;
 			}
 			return $responseCode;
 	}
 	
 	function getLastResponseCode() {
+		//return the response code from xml
 		return $this->lastResponseCode;
 	}
 	
 	function getLastResponseText() {
+		//return the response message from xml
 		return $this->lastResponseText;
 	}
 	
-}	// End of SecurePayTransaction class
+	function getConfirmationID(){
+		//return the confirmed transaction
+		return $this->confirmationID;
+		
+	}
+	
+}
 ?>
