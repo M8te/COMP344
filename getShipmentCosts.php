@@ -2,7 +2,7 @@
 require_once('config.php');
 
 global $debug;
-$debug = false;
+$debug = true;
 
 class CalculateShipment {
 	private $apikey;
