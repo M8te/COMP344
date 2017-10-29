@@ -14,6 +14,13 @@ $securePayConfig = array(
 		'timezone' => "+600", //Australia East Cast
 		'txnsource' => "23");
 
+$shipmentConfig = array(
+		'apikey' => "cee1166e-73a1-45ad-b78c-e13e8f9c88b1",
+		'host' => "https://digitalapi.auspost.com.au",
+		'domesticendpoint' => "/postage/parcel/domestic/calculate.json?",
+		'internationalendpoint' => "/postage/parcel/international/calculate.json?"
+);
+
 $approvedResponseCodes = ["00","77"]; //payment approved response codes
 		
 // Time zone
