@@ -2,7 +2,7 @@
 require_once('config.php');
 
 global $debug;
-$debug = true;
+$debug = false;
 
 class CalculateShipment {
 	private $apikey;
@@ -15,7 +15,7 @@ class CalculateShipment {
 	
 	function __construct() {
 		
-		$this->jsonresponse = [];
+		$this->jsonresponse = array();
 		// config.php variables
 		
 		global $shipmentConfig;
@@ -85,6 +85,13 @@ class CalculateShipment {
 		$ch = curl_init();
 				
 		//Calculate the delivery cost
+		
+		// These following two lines were added to make this API run on Spider. On other hosts it runs correctly, however Spider throws an SSL error.
+		// If moving to an different hosting platform these can be removed.
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		// End of lines
+		
 		curl_setopt($ch, CURLOPT_URL, $calculateRateURL);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('AUTH-KEY: ' . $this->apikey));

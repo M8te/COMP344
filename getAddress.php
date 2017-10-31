@@ -93,11 +93,23 @@ function querySpecificAddress($address_pk){
 
 function updateOrderAddress($address, $order){
 
-
 	$query = 'update "Order" set order_shaddr = ' . $address . ' where order_id = ' . $order;
 	run_db_query($query);
-	
+}
 
+function queryOrderShippingType($order_pk){
+# Returns the shipping method set in the order
+
+		$query = 'select order_shipping_type from "Order" where order_id = ' . $order_pk;
+		$queryOutput = run_db_query($query); // Run query on DB and store result
+		$row  = $queryOutput -> fetch(); // Get the first value, as only one row returned by query	
+		return $row;
+}
+
+function updateOrderShippingType($shipping_type, $order){
+
+	$query = 'update "Order" set order_shipping_type = \'' . $shipping_type . '\' where order_id = ' . $order;
+	run_db_query($query);
 }
 
 ?>
