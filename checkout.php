@@ -1,12 +1,20 @@
 <?php
+session_start();  // JR start sessions 
+
 
 // NOTES
 // 1) Session tracking
 // 4) Query address SQL
 
 //TO CHANGE
+
 $order_id = 1; // Update to session order ID
+$_SESSION['order_id'] = $order_id;  //JR
+
+
 $current_user = 8; // Update to session user
+$_SESSION['current_user']=$current_user;  //JR
+
 //END TO CHANGE
 
 // Files to reference
@@ -113,30 +121,45 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 				<b>Shipping Method:</b> <?php echo($selected_shipping_type); ?>
 				<br><br>
 				</div>
+			</form>  <!--  JR moved end of form here -->
 			
 				<div class = "column">
 					<h2>Payment Information:</h2>
 				
-				<form>
-				<label for="cc_number">Credit Card Number:</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<input type="text" id="cc_number" name="cc_number" placeholder="1234 5678 1234 5678"><br>
+				<form name="payment" action="paymentProcessor.php" method="post"> <!--  JR added action and method -->
 				
-				<label for="cc_expiry_month">Credit Card Expiry Month:</label>
-				 <input type="text" id="cc_expiry_month" name="cc_expiry_month" placeholder="August"> <br>
-				
-				<label for="cc_expiry_year">Credit Card Expiry Year:</label>&nbsp;&nbsp;&nbsp;
-				<input type="text" id="cc_expiry_year" name="cc_expiry_year" placeholder="2019"><br>
-				
-				<label for="cc_ccv">Credit Card CCV:</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<input type="text" id="cc_ccv" name="cc_ccv" placeholder="123"><br>
-				
+					<label for="cc_number">Credit Card Number:</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="text" id="cc_number" name="cc_number" value = "4444333322221111" placeholder="1234567812345678"><br> <!-- JR added default test card -->
+					
+					<label for="cc_expiry_month">Credit Card Expiry Month (MM):</label>
+					 <input type="text" id="cc_expiry_month" name="cc_expiry_month" value= "09" placeholder="08"> <br> <!-- JR added default test card month -->
+					
+					<label for="cc_expiry_year">Credit Card Expiry Year (YY):</label>&nbsp;&nbsp;&nbsp;
+					<input type="text" id="cc_expiry_year" name="cc_expiry_year" value= "23" placeholder="17"><br> <!-- JR added default test card year-->
+					
+					<label for="cc_ccv">Credit Card CCV:</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="text" id="cc_ccv" name="cc_ccv" value = "123" placeholder="123"><br> <!-- JR added default test card ccv -->
+					<input type="submit" value="Make Payment"> <!-- JR Add submit button on form (copy of one at bottom of page) -->
+					
+					 <!--  JR added debug code so see response from payment process -->
+					<?php
+						global $debug;
+						$debug=false;
+						
+						if($debug)
+						{
+							if (isset($_SESSION["payment_successful"])) echo $_SESSION["payment_successful"];
+							if (isset($_SESSION["confirmation_id"])) echo $_SESSION["confirmation_id"];
+							if (isset($_SESSION["payment_error"])) echo $_SESSION["payment_error"];
+						}
+					?>
 				</form>
 				</div>
 				</div>
 	<div id = "order">
 	
-	<table border = 1">
-
+	<table border = 1>
+	
 			<tr>
 				<?php 
 				$header_cart = array("Product", "Type", "Quantity", "Price", "Total"); // Headers for each of the columns
@@ -177,9 +200,11 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 		</table>
 	</div>
 	<br>
+
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="submit" value="Make Payment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=""><button>Return to Cart</button></a>
+
 	<br /><br/>
-	</form>
+	<!-- </form>  JR commented end of form-->
 	</div>
 	
   </body>
