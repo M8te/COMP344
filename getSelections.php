@@ -1,14 +1,32 @@
 <?php
 
-function selectionShippingType(){
+function selectionShippingType($order_id){
 # Checks if a postage shipping type has been posted and if so, validate this and return it.
 # If invalid or no posted, return default (Standard)	
+
+global $shippingMethods;
+$orderShippingType = queryOrderShippingType($order_id);
 	
 	if(!empty($_POST["shipping_type"])){ // If value posted
 		$get_shipping_type = filter_var($_POST['shipping_type'], FILTER_SANITIZE_STRING); // Sanatize input and save as a variable
 
-		if (in_array($get_shipping_type, array('Standard', 'Registered', 'Express'), true)){ // Validate that it is a valid postage method
-			return $get_shipping_type; // Valid so return posted value
+		if (in_array($get_shipping_type, $shippingMethods, true)){ // Validate that it is a valid postage method
+			
+			if (isSet($orderShippingType) && $get_shipping_type == $orderShippingType){ // Value posted is same as value in DB so just return this
+				return $get_shipping_type;
+			}
+			else{
+				updateOrderShippingType($get_shipping_type, $order_id);
+				return $get_shipping_type;
+			
+			}
+				// if so return
+				
+				// if not update then return
+				
+			
+			
+			 // Valid so return posted value
 		}
 	}
 
@@ -17,11 +35,11 @@ function selectionShippingType(){
 
 
 
-function selectionDefaultShipping($user, $order){
+function selectionDefaultShipping($user, $order_id){
 	
 
 	$defaultAddress = queryDefaultAddress($user); // PK of address listed as primary/default for user
-	$orderAddress = queryOrderAddress($order); // Address listed in the order, if one exists
+	$orderAddress = queryOrderAddress($order_id); // Address listed in the order, if one exists
 	
 	if(!empty($_POST["shipping_address"])){ 
 		$get_shipping_address = filter_var($_POST['shipping_address'], FILTER_SANITIZE_STRING); // Sanatize input and save as a variable
@@ -34,7 +52,7 @@ function selectionDefaultShipping($user, $order){
 			}
 			
 			else {
-				updateOrderAddress($get_shipping_address, $order);
+				updateOrderAddress($get_shipping_address, $order_id);
 				return $get_shipping_address;
 			}
 		}
@@ -46,7 +64,7 @@ function selectionDefaultShipping($user, $order){
 		}
 		
 		else{ // No address for order - update this with default value and return default value
-			updateOrderAddress($defaultAddress, $order);
+			updateOrderAddress($defaultAddress, $order_id);
 			return $defaultAddress;
 		}
 	}	

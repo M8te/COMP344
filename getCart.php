@@ -60,6 +60,19 @@ function getSubtotal($order_pk){
 
 }
 
+function getGST($cost_subtotal, $order_country){
+#Returns the GST amount required for payment
+
+	global $gstRate;
+
+	if ($order_country == "Australia"){
+		return $cost_subtotal * $gstRate;
+	}
+
+	return 0;
+
+}
+
 function getItemDimensions($order){
 
 	$query = ' select';
@@ -89,4 +102,11 @@ function getItemDimensions($order){
 	
 	}
 	
+function updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_total){
+
+	$query = 'update "Order" set ORDER_SHIPPINGAMOUNT = ' . $cost_shipping . ', ORDER_TAXAMOUNT = ' . $cost_gst;
+	$query .= ', ORDER_PRODUCTAMOUNT = ' .  $cost_subtotal . ', ORDER_TOTAL = ' . $cost_total . ' where order_id = ' . $order_id;
+	run_db_query($query);
+}	
+
 ?>

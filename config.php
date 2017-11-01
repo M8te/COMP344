@@ -2,6 +2,8 @@
 // Stores a list of global configurations
 
 $gstRate =  0.15;
+$shippingMethods = array('Standard', 'Express');
+$fromPostcode = '2000';
 
 // SecurePay Credentials.
 
@@ -24,7 +26,7 @@ $shipmentConfig = array(
 		
 );
 
-$approvedResponseCodes = ["00","77"]; //payment approved response codes
+$approvedResponseCodes = array("00","77"); //payment approved response codes
 		
 // Time zone
 date_default_timezone_set ("Australia/Sydney");

@@ -114,7 +114,7 @@ class CalculateShipment {
 		{
 			echo "<p>Query Parameters: ";
 			print_r($queryParameters);
-			echo "</p>";
+
 		}
 					
 	
