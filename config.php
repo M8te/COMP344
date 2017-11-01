@@ -18,7 +18,10 @@ $shipmentConfig = array(
 		'apikey' => "cee1166e-73a1-45ad-b78c-e13e8f9c88b1",
 		'host' => "https://digitalapi.auspost.com.au",
 		'domesticendpoint' => "/postage/parcel/domestic/calculate.json?",
-		'internationalendpoint' => "/postage/parcel/international/calculate.json?"
+		'internationalendpoint' => "/postage/parcel/international/calculate.json?",
+		'internationalshipoptionendpoint' => "/postage/parcel/international/service.json?",
+		'domesticshipoptionendpoint' => "/postage/parcel/domestic/service.json?"
+		
 );
 
 $approvedResponseCodes = ["00","77"]; //payment approved response codes
