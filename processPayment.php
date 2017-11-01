@@ -104,10 +104,10 @@ class SecurePayTransaction {
 			$currency = "AUD";
 			
 		// generate unique transaction identifier with orderid prefixed
-		$id = uniqid($orderid,true);
+		$id = uniqid($orderid,TRUE);
 		
 		if ($debug)
-			echo "uniqueID = $id <br>";
+			echo "UniqueID generated for request = $id <br>";
 		
 		// Create the root element
 		$message = $this->requestDOM->appendChild($this->requestDOM->createElement('SecurePayMessage'));
@@ -152,14 +152,15 @@ class SecurePayTransaction {
 		$xmlquery = $this->requestDOM->saveXML();
 		
 		if ($debug)
-			echo htmlentities($xmlquery) . "<br/>";
+			echo "Request body: <br/>" . htmlentities($xmlquery) . "<br/>";
+		
 			
 			//tranmission of xml 
 			
 			$host = $this->endpoint;
 			$c = curl_init($host);
 			curl_setopt($c, CURLOPT_POST, 1);
-			curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($c, CURLOPT_SSL_VERIFYPEER, FALSE);
 			curl_setopt($c, CURLOPT_HTTPHEADER, array(
 					'Content-type' => 'application/x-www-form-urlencoded\r\n',
 					'Content-length' => strlen($xmlquery),
@@ -173,18 +174,18 @@ class SecurePayTransaction {
 			
 			$response = curl_exec($c);
 			
-			if ($response == false) {
+			if ($response == FALSE) {
 				die("CURL Transfer failed; error: " . curl_error($c));
 			}
 			
 			if ($debug) {
 				echo "<br/><br/>";
-				echo "And here is the response:<br/>";
-				echo htmlentities($response);
+				echo "API respose:<br/>";
+				echo htmlentities($response) . "<br/>";
 			}
 			
 			$this->responseDOM = new DOMDocument('1.0');
-			$this->responseDOM->formatOutput = true;
+			$this->responseDOM->formatOutput = TRUE;
 			$this->responseDOM->loadXML($response);
 			
 			//determine response code
@@ -192,10 +193,13 @@ class SecurePayTransaction {
 			if ($debug) {
 				echo "<br/><br/>";
 				foreach ($response_codes as $response_code) {
-					echo "responseCode = " . $response_code->nodeValue . "<br/>";
+					echo "<br/>responseCode = " . $response_code->nodeValue . "<br/>";
+					echo "</br/> responseCodes length = " . $response_codes->length . "<br/>";
 				}
-				echo "responseCodes length = " . $response_codes->length . "<br/>";
+				
 			}
+			
+			$responseCode='';
 			
 			if ($response_codes->length == 1) {
 				$responseCode = $response_codes->item(0)->nodeValue;
@@ -203,6 +207,7 @@ class SecurePayTransaction {
 				$this->lastResponseText = $this->responseDOM->getElementsByTagName('responseText')->item(0)->nodeValue;
 				$this->confirmationID = $this->responseDOM->getElementsByTagName('txnID')->item(0)->nodeValue;
 			}
+			
 			return $responseCode;
 	}
 	
