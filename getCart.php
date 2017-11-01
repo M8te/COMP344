@@ -103,6 +103,7 @@ function getItemDimensions($order){
 	}
 	
 function updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_total){
+# Update the order fields in the DB
 
 	$query = 'update "Order" set ORDER_SHIPPINGAMOUNT = ' . $cost_shipping . ', ORDER_TAXAMOUNT = ' . $cost_gst;
 	$query .= ', ORDER_PRODUCTAMOUNT = ' .  $cost_subtotal . ', ORDER_TOTAL = ' . $cost_total . ' where order_id = ' . $order_id;
@@ -110,7 +111,7 @@ function updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, 
 }	
 
 function updatePaymentConfirmation($order_id, $confirmation_id) {
-	// update the order with payment confirmation id. 
+# Update the order with payment confirmation id. 
 	
 	$query = "update \"Order\" set ORDER_PAYMENT_CONFIRMATION_ID = '" . $confirmation_id ."'";
 	$query .= ' where order_id = ' . $order_id;
@@ -119,7 +120,7 @@ function updatePaymentConfirmation($order_id, $confirmation_id) {
 
 
 function getOrderTotal($order_id){
-	# Returns the total order cost
+# Returns the total order cost
 	
 	// Build query to return total order cost
 	$query = 'select';
@@ -128,12 +129,18 @@ function getOrderTotal($order_id){
 	$query .= ' where order_id = ' . $order_id;
 	
 	$ordertotal=array(); //initialize
-	
+	$queryOutput = run_db_query($query); // Run query
+	$ordertotal = $queryOutput->fetch(PDO::FETCH_ASSOC);
+	return $ordertotal['total'];
+}
+
+function getAllCosts($order_id){
+
+	$query = 'select ORDER_SHIPPINGAMOUNT, ORDER_TAXAMOUNT, ORDER_PRODUCTAMOUNT, ORDER_TOTAL from "Order" where order_id = ' . $order_id;
 	$queryOutput = run_db_query($query); // Run query
 	
-	$ordertotal = $queryOutput->fetch(PDO::FETCH_ASSOC);
-	
-	return $ordertotal['total'];
-	
+	return $queryOutput;
+
 }
+
 ?>
