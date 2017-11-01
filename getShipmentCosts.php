@@ -2,7 +2,7 @@
 require_once('config.php');
 
 global $debug;
-$debug = true;
+$debug = false;
 
 class CalculateShipment {
 	private $apikey;
@@ -15,7 +15,7 @@ class CalculateShipment {
 	
 	function __construct() {
 		
-		$this->jsonresponse = [];
+		$this->jsonresponse = array();
 		// config.php variables
 		
 		global $shipmentConfig;
@@ -24,6 +24,43 @@ class CalculateShipment {
 		$this->host = $shipmentConfig['host'];
 
 		
+	}
+	
+	function executeAPIRequest($parameters)
+	{
+		
+		/*
+		 * Function executes an API request and returns the decoded JSON response as an array
+		 * Parameters:
+		 * $parameters - Parameters to be used in the request
+		 */
+		
+		global $debug;
+		
+		// build URL + query string
+		$calculateRateURL = $this->host . $this->endpoint . http_build_query($parameters);
+		
+		if($debug)
+			echo "<p> URL: " . $calculateRateURL . "</p>";
+		
+		//initalize curl
+		$ch = curl_init();
+		
+		//Calculate the delivery cost
+		curl_setopt($ch, CURLOPT_URL, $calculateRateURL);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('AUTH-KEY: ' . $this->apikey));
+		
+		// transmit and store result
+		$rawBody = curl_exec($ch);
+		
+		// if the body is empty kill and print error
+		if(!$rawBody){
+			die('An error has occurred: "' . curl_error($ch) . '" with code: ' . curl_errno($ch));
+		}
+		
+		// decode json into array and return
+		return json_decode($rawBody, true);
 	}
 	
 	function determinecosts($frompostcode, $topostcode, $lenghtCM, $widthCM, $heighCM, $weightKG, $servicetype, $countrycode) 
@@ -70,38 +107,24 @@ class CalculateShipment {
 			//set international end point
 			$this->endpoint = $shipmentConfig['internationalendpoint'];
 		}
-			
 	
 		if($debug)
+		{
+			echo "<p>Query Parameters: ";
 			print_r($queryParameters);
-		
-		// build URL + query string
-		$calculateRateURL = $this->host . $this->endpoint . http_build_query($queryParameters);
-		
-		if($debug)
-			echo "<br> URL: " . $calculateRateURL . "<br>";
-		
-		//initalize curl
-		$ch = curl_init();
-				
-		//Calculate the delivery cost
-		curl_setopt($ch, CURLOPT_URL, $calculateRateURL);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('AUTH-KEY: ' . $this->apikey));
-		
-		// transmit and store result
-		$rawBody = curl_exec($ch);
-		
-		// if the body is empty kill and print error
-		if(!$rawBody){
-			die('An error has occurred: "' . curl_error($ch) . '" with code: ' . curl_errno($ch));
+			echo "</p>";
 		}
-		
-		// decode json into array
-		$jsonresponse = json_decode($rawBody, true);
+					
+	
+		$jsonresponse = $this->executeAPIRequest($queryParameters);
 		
 		if($debug)
+		{
+			echo "<p>Shipment Cost API response:<br>";
 			print_r($jsonresponse);
+			echo "</p>";
+		}
+			
 		
 		// set total cost if found in json response
 		if(isset($jsonresponse['postage_result']['total_cost']))
@@ -112,15 +135,84 @@ class CalculateShipment {
 			$this->deliverytimemessage = $jsonresponse['postage_result']['delivery_time'];
 		
 		
-		return true;
+		return true; //success completion.
 	}
 	
-	function getDeliveryTimeMessage(){
+	
+	function determineShippingOptions($frompostcode, $topostcode, $lenghtCM, $widthCM, $heighCM, $weightKG, $countrycode) 
+	{
+		/*
+		 * Function returns internatioanl shipping options
+		 * Parameters:
+		 * $weightKG = weight of item to be shipped in Kilograms (mandatory for domestic shipment)
+		 * $countrycode = country to which item will be shipped (mandatory ONLY for international shipment)
+		 *
+		 */
+		
+		global $debug;
+		global $shipmentConfig;
+		$shipotions = array();
+		
+		// build URL query parameters
+		$queryParameters = array(
+				"weight" => $weightKG);
+		
+		// parameters for domestic shipments only
+		if(!$countrycode){
+			$queryParameters['from_postcode'] = $frompostcode;
+			$queryParameters['to_postcode'] = $topostcode;
+			$queryParameters['length'] = $lenghtCM;
+			$queryParameters['width'] = $widthCM;
+			$queryParameters['height'] = $heighCM;
+			
+			//set domestic endpoint
+			$this->endpoint = $shipmentConfig['domesticshipoptionendpoint']; ///***********
+		}
+		else
+		{
+			//parameters for international shipments only
+			$queryParameters['country_code'] = $countrycode;
+			
+			//set international end point
+			$this->endpoint = $shipmentConfig['internationalshipoptionendpoint']; ///***********
+		}
+		
+		//execute request and return response array
+		$jsonresponse = $this->executeAPIRequest($queryParameters);
+		
+		if($debug)
+		{
+			echo "<p>Shipping Service API Response:<br>";
+			print_r($jsonresponse);
+			echo "</p>";
+		}
+		
+		// Loop through response and return associative array of international postage services 'code' and 'name'.
+		foreach ($jsonresponse['services']['service'] as $key => $value) {
+			foreach ($jsonresponse['services']['service'][$key] as $k => $val){
+				$shipotions [$jsonresponse['services']['service'][$key]['code']] = $jsonresponse['services']['service'][$key]['name'];
+				break;
+			}
+		}
+		
+		if($debug)
+		{
+			echo "<p>Shipping services:<br>";
+			print_r($shipotions);
+			echo "</p>";
+		}
+		
+		return $shipotions;
+	}
+	
+	function getDeliveryTimeMessage()
+	{
 		//return parcel delivery time message
 		return $this->deliverytimemessage;
 	}
 	
-	function getItemShipmentCost(){
+	function getItemShipmentCost()
+	{
 		//return item shipment cost
 		return $this->totalshipmentcost;
 	}
