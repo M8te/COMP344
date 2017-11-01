@@ -1,6 +1,6 @@
 <?php
 global $debug;
-$debug = true;
+$debug = true; // set to false when not required.
 session_start();
 
 

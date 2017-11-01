@@ -119,7 +119,7 @@ if (!$error)
 		$_SESSION["payment_error"]= "Error processing payment. Error Code: " . $paytransaction->getLastResponseCode() . ". Error Description: " . $paytransaction->getLastResponseText();
 		
 		//back to checkout
-		//header('Location: checkout.php');
+		header('Location: checkout.php');
 	}
 	
 }
@@ -129,7 +129,7 @@ else //if validation errors identified
 	$_SESSION["payment_successful"]=FALSE;
 	
 	//back to checkout
-	//header('Location: checkout.php');
+	header('Location: checkout.php');
 }
 
 
