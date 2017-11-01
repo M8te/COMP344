@@ -26,6 +26,11 @@
 	
 }
 
+#checkout_error {
+	color:red;
+	font-weight:bold;
+}
+
 /* Navbar and body */
 
 body {

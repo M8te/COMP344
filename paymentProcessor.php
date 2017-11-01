@@ -119,6 +119,9 @@ if (!$error)
 		$_SESSION["payment_error"]= "Error processing payment. Error Code: " . $paytransaction->getLastResponseCode() . ". Error Description: " . $paytransaction->getLastResponseText();
 		
 		//back to checkout
+		
+		echo($_SESSION["payment_error"]);
+		
 		header('Location: checkout.php');
 	}
 	

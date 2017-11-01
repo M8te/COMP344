@@ -15,6 +15,7 @@ $_SESSION['order_id'] = $order_id;  //JR
 $current_user = 8; // Update to session user
 $_SESSION['current_user']=$current_user;  //JR
 
+
 //END TO CHANGE
 
 // Files to reference
@@ -75,6 +76,15 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 	    });
 	</script>
 	<h1>Checkout System</h1>
+	<div id = "checkout_error">
+	
+	<?php
+		if (isset($_SESSION['payment_error'])){ 
+			echo($_SESSION['payment_error']);
+		}
+	?>
+	
+	</div>
 	
 	<div id = "address_form">
 		<form action='checkout.php' method='post'>
@@ -139,8 +149,9 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 					
 					<label for="cc_ccv">Credit Card CCV:</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					<input type="text" id="cc_ccv" name="cc_ccv" value = "123" placeholder="123"><br> <!-- JR added default test card ccv -->
+					<br />
 					<input type="submit" value="Make Payment"> <!-- JR Add submit button on form (copy of one at bottom of page) -->
-					
+					;<a href=""><button>Return to Cart</button></a>
 					 <!--  JR added debug code so see response from payment process -->
 					<?php
 						global $debug;
@@ -156,6 +167,7 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 				</form>
 				</div>
 				</div>
+				<br />
 	<div id = "order">
 	
 	<table border = 1>
@@ -201,10 +213,6 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 	</div>
 	<br>
 
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="submit" value="Make Payment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=""><button>Return to Cart</button></a>
-
-	<br /><br/>
-	<!-- </form>  JR commented end of form-->
 	</div>
 	
   </body>
