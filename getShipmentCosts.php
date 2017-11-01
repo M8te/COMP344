@@ -46,7 +46,9 @@ class CalculateShipment {
 		//initalize curl
 		$ch = curl_init();
 		
-		//Calculate the delivery cost
+		//set curl options
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 		curl_setopt($ch, CURLOPT_URL, $calculateRateURL);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('AUTH-KEY: ' . $this->apikey));
