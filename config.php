@@ -26,7 +26,7 @@ $shipmentConfig = array(
 		
 );
 
-$approvedResponseCodes = array("00","77"); //payment approved response codes
+$approvedResponseCodes = array("00", "08", "11", "16". "77"); //payment approved response codes
 		
 // Time zone
 date_default_timezone_set ("Australia/Sydney");
