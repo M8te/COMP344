@@ -69,6 +69,9 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 			$("#footerAJAX").load("Resources/footer.html");
 	    });
 	</script>
+	
+	<div style="padding:10px;">
+	
 	<h1>Checkout System</h1>
 	
 	<div id = "checkout_error">
@@ -223,7 +226,7 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 
 		</table>
 	</div>
-	
+	</div>
 
 	<br />
 	<br />

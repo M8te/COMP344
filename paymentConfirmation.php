@@ -1,12 +1,11 @@
 <?php
-
 // Files to reference
 include("config.php"); //Global config
 include("getCart.php"); // Used to get details realting to the cart
 include("getAddress.php"); // Used to get details relating to the users address
 
-session_start();
 
+session_start();
 // CHECK THIS
 //$_SESSION["confirmation_id"]= $confirmationid;
 //$_SESSION['order_id'] = $order_id;  //JR
@@ -15,11 +14,33 @@ session_start();
 
 $current_user = 8; // Update to session user
 $order_id = 1; // Update to session order ID
-
 $invoice_costs = getAllCosts($order_id); // Costs
 $query_order = queryOrder($order_id); // Stores a list of items in users cart
 $order_address = querySpecificAddress(queryOrderAddress($order_id)); // Selected shipping values
 
+
+	$users_email = queryEmail($current_user);
+	$email = "ben.woods@students.mq.edu.au";
+	$subject = "Account Registration";
+	$txt = "Thank you for making a purchase with the Macqaurie Uni Bookshop. We hope you enjoy your purchase and come back to shop with us in the future. 
+Order number is: $order_id
+Name: $order_address[3] $order_address[4]
+Shipping Information:
+Street: $order_address[5]
+Postcode: $order_address[9]
+City: $order_address[7]
+State: $order_address[8]
+Country: $order_address[10]
+Cost:
+Subtotal: $$invoice_costs[2]
+GST: $$invoice_costs[1]
+Shipping: $$invoice_costs[0]
+Total Cost: $$invoice_costs[3]
+";
+	$headers = "From: NO-REPLY@BOOKSHOP.COM";  
+	mail($email,$subject,$txt,$headers);
+	
+	
 ?>
 
 
@@ -42,7 +63,9 @@ $order_address = querySpecificAddress(queryOrderAddress($order_id)); // Selected
 	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<!-- Google Fonts –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 	<link href="https://fonts.googleapis.com/css?family=Roboto:100,200,300,400,500,700,900" rel="stylesheet">
+	
 </head>
+
 <body>
 	<nav id="navAJAX" class="navbar navbar-inverse"></nav>
 	<script>
@@ -54,68 +77,57 @@ $order_address = querySpecificAddress(queryOrderAddress($order_id)); // Selected
 	    });
 	</script>
 
-	<?php
-	$users_email = queryEmail($current_user);
-	$email = "nicholas.mchugh@students.mq.edu.au";
-	$subject = "Account Registration";
-	$txt = "Thank you for making a purchase with the Macqaurie Uni Bookshop. We hope you enjoy your purchase and come back to shop with us in the future. 
 
-Order number is: $order_id
 
-Name: $order_address[3] $order_address[4]
+	<div id = "invoice_details" style="padding:10px;">
+			
+		<h1>Your order has been successfully placed!</h1>
+		<p><b>Thank you for shopping with Macquarie Uni Bookshop. Your order number is: #</b><?php echo($order_id); ?></p>
 
-Shipping Information:
-Street: $order_address[5]
-Postcode: $order_address[9]
-City: $order_address[7]
-State: $order_address[8]
-Country: $order_address[10]
+		<p>An email has been sent to <?php echo($users_email); ?>. Your order will be sent to your <?php echo($order_address[2]); ?> address, listed below. We'll let you know once your item(s) have been dispatched with an estimated delivery time.</p>
+		
+		<br />
+		
+		<table style="width:20%;">
+			<tr>
+				<td><b>Name:</b></td> 
+				<td><?php echo($order_address[3] . " " . $order_address[4]); ?> </td> 
+			</tr>
+			<tr>
+				<td><b>Street:</b></td> 
+				<td><?php echo($order_address[5]); ?> </td> 
+			</tr>
+			<tr>
+				<td><b>Postcode:</b></td>
+				<td><?php echo($order_address[9]); ?> </td>
+			</tr>			
+			
+			<tr>
+				<td><b>City:</b></td>
+				<td><?php echo($order_address[7]); ?></td>
+			</tr>
+			
+			<tr>
+				<td><b>State:</b></td>
+				<td><?php echo($order_address[8]); ?></td>
+			</tr>
+			
+			<tr>
+				<td><b>Postcode:</b></td>
+				<td><?php echo($order_address[9]); ?></td>
+			</tr>
+			
+			<tr>
+				<td><b>Country: </b></td>
+				<td><?php echo($order_address[10]); ?></td>
+			</tr>
 
-Cost:
-Subtotal: $$invoice_costs[2]
-GST: $$invoice_costs[1]
-Shipping: $$invoice_costs[0]
-Total Cost: $$invoice_costs[3]
+		</table>
+		
+		<?php echo($order_address[6]); ?> 
 
-";
-	$headers = "From: NO-REPLY@BOOKSHOP.COM";  
-	mail($email,$subject,$txt,$headers);
-	
-	?>
-	
-	<div id = "address_form">
-		<form action='checkout.php' method='post'>
-			<div class = "row">
-				<div class = "column">
-					<h2>Invoice</h2>
-					<b>Your order number is: <?php echo($order_id); ?></b><br><br>
-					Thank you for shopping with Macquarie Uni Bookshop. An email has been sent to <?php echo($users_email); ?>. We'll let you know once your item(s) have been dispatched with an estimated delivery time. 
-					
-
-				
-				</div>
-				<div class = "column">
-					<h2>Shipping information: </h2>
-					
-					Your order has been sent to your <?php echo($order_address[2]); ?> address:
-					<?php echo("<br />"); ?>
-					Street: <?php echo($order_address[5]); ?> 
-					<?php echo("<br />"); ?>
-					Postcode: <?php echo($order_address[9]); ?> 
-					<?php echo("<br />"); ?>
-					City: <?php echo($order_address[7]); ?>
-					<?php echo("<br />"); ?>
-					State: <?php echo($order_address[8]); ?> 
-					<?php echo("<br />"); ?>
-					Country: <?php echo($order_address[10]); ?> 
-					<?php echo($order_address[6]); ?> 
-				</div>
-				</div>
-	<br />		
-	<br />
 	<br />
 				
-			</form>  
 			
 				<br />
 	<div id = "order"><h2>Items ordered:</h2>
@@ -168,13 +180,3 @@ Total Cost: $$invoice_costs[3]
   </body>
   <footer id="footerAJAX"></footer>
 </html>
-
-
-
-
-
-
-
-
-
-
