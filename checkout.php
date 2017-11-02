@@ -1,29 +1,23 @@
 <?php
-session_start();  // JR start sessions 
-
-
-// NOTES
-// 1) Session tracking
-// 4) Query address SQL
+session_start();  // start sessions 
 
 //TO CHANGE
-
 $order_id = 1; // Update to session order ID
-$_SESSION['order_id'] = $order_id;  //JR
+$_SESSION['order_id'] = $order_id;  
 
 
 $current_user = 8; // Update to session user
-$_SESSION['current_user']=$current_user;  //JR
-
-
+$_SESSION['current_user']=$current_user;  
 //END TO CHANGE
+
+
 
 // Files to reference
 include("config.php"); //Global config
 include("getCart.php"); // Used to get details realting to the cart
 include("getAddress.php"); // Used to get details relating to the users address
 include("getSelections.php"); // Used to set default checked values for the forms
-include("getPostage.php");
+include("getPostage.php"); // Used to get postage information
 
 // SQL queries
 $query_order = queryOrder($order_id); // Stores a list of items in users cart
@@ -32,8 +26,8 @@ $query_address = queryAllAddress($current_user); // Stores a list of all address
 // Selected shipping values
 $selected_shipping_type = selectionShippingType($order_id); // Used to set the checked value for shipping type, based on default or posted value
 $selected_shipping_address = selectionDefaultShipping($current_user, $order_id); // Used to set the checked type for shipping address, based on default type or posted value
-$order_address = querySpecificAddress($selected_shipping_address);
-$order_country = $order_address[10];
+$order_address = querySpecificAddress($selected_shipping_address); // Address of the user
+$order_country = $order_address[10]; // Country of user, stored seperatly as needs to be referned for GST checking
 
 // Costs
 $cost_subtotal = getSubtotal($order_id); // Cost of all items in cart 
@@ -41,7 +35,7 @@ $cost_gst = getGST($cost_subtotal, $order_country); // GST cost of items in cart
 $cost_shipping = getPostageCost($selected_shipping_address, $order_id, $selected_shipping_type); // Shipping cost, determined by contacting Aus post
 $cost_total = $cost_subtotal + $cost_gst + $cost_shipping; // Total cost - subtotal + GST + shipping
 
-updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_total);
+updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_total); // Update the DB with the users
 
 ?>
 
@@ -76,102 +70,117 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 	    });
 	</script>
 	<h1>Checkout System</h1>
+	
 	<div id = "checkout_error">
-	
-	<?php
-		if (isset($_SESSION['payment_error'])){ 
-			echo($_SESSION['payment_error']);
-		}
-	?>
-	
+		<?php
+			if (isset($_SESSION['payment_error'])){ 
+				echo($_SESSION['payment_error']);
+			}
+		?>
 	</div>
 	
 	<div id = "address_form">
 		<form action='checkout.php' method='post'>
 			<div class = "row">
+			
 				<div class = "column">
-				<h2>Select Address: </h2>
-				<?php 
-				
-					while ($row_address = $query_address->fetch()){ // Iterate through all addresses stored for user
-						
-						$line_text = "<b>" . $row_address[2] . ":</b><br />"; // Format address
-						$line_text .= $row_address[3] . " " . $row_address[4] . "<br />";
-						$line_text .= $row_address[5] . ", " ; 
+					<h2>Select Address: </h2>
+					<?php 
+					
+						while ($row_address = $query_address->fetch()){ // Iterate through all addresses stored for user
+							
+							$line_text = "<b>" . $row_address[2] . ":</b><br />"; // Format address
+							$line_text .= $row_address[3] . " " . $row_address[4] . "<br />";
+							$line_text .= $row_address[5] . ", " ; 
 
-						if ($row_address[6] != ""){ // Only display the second street address if this exists
-							$line_text .= $row_address[5] . ", ";
-						}
-						$line_text .= $row_address[7] . ", " . $row_address[8] . ", " . $row_address[9] . ", " . $row_address[10];
-						
-						$line_selector = "<input type = 'radio' name = 'shipping_address' value = " . $row_address[0]; // Format the radio button
-						if ($row_address[0] == $selected_shipping_address){ // If this is selected value, mark it as checked
-							$line_selector .= " checked";
-						}
-						$line_selector .= " onclick='displayShippingCountry(\"" . $row_address[10] ."\")' >" . $line_text . "<br />";
-						
-						echo($line_selector); // Display the formatted address value
-						echo("<br />");
-						
-					}
-				?>
-				</div>
-			
-				<div class = "column">
-				<div id = "shipping_choice" float="center">
-					<h2>Select Shipping Method:</h2>
-					<input type = 'radio' name = 'shipping_type' value = "Standard" <?php if ($selected_shipping_type == 'Standard')echo(" checked='true'"); ?>>Standard<br />
-					<input type = 'radio' name = 'shipping_type' value = "Express" <?php if ($selected_shipping_type == 'Express')echo(" checked='true' "); ?>>Express<br />
-				</div><br>
-				<div id = "shipping_button">
-					<input type='submit' name='Submit' value='Update Shipping Information' /><br /><br />
-				</div>	
-				<b>Shipping To:</b> <?php echo($order_address[3] . ' ' . $order_address[4] . ', ' . $order_address[5] . ' ' . $order_address[6] . ', ' . $order_address[7]); ?>
-				<br>
-				<b>Shipping Method:</b> <?php echo($selected_shipping_type); ?>
-				<br><br>
-				</div>
-			</form>  <!--  JR moved end of form here -->
-			
-				<div class = "column">
-					<h2>Payment Information:</h2>
-				
-				<form name="payment" action="paymentProcessor.php" method="post"> <!--  JR added action and method -->
-				
-					<label for="cc_number">Credit Card Number:</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					<input type="text" id="cc_number" name="cc_number" value = "4444333322221111" placeholder="1234567812345678"><br> <!-- JR added default test card -->
-					
-					<label for="cc_expiry_month">Credit Card Expiry Month (MM):</label>
-					 <input type="text" id="cc_expiry_month" name="cc_expiry_month" value= "09" placeholder="08"> <br> <!-- JR added default test card month -->
-					
-					<label for="cc_expiry_year">Credit Card Expiry Year (YY):</label>&nbsp;&nbsp;&nbsp;
-					<input type="text" id="cc_expiry_year" name="cc_expiry_year" value= "23" placeholder="17"><br> <!-- JR added default test card year-->
-					
-					<label for="cc_ccv">Credit Card CCV:</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					<input type="text" id="cc_ccv" name="cc_ccv" value = "123" placeholder="123"><br> <!-- JR added default test card ccv -->
-					<br />
-					<input type="submit" value="Make Payment"> <!-- JR Add submit button on form (copy of one at bottom of page) -->
-					;<a href=""><button>Return to Cart</button></a>
-					 <!--  JR added debug code so see response from payment process -->
-					<?php
-						global $debug;
-						$debug=false;
-						
-						if($debug)
-						{
-							if (isset($_SESSION["payment_successful"])) echo $_SESSION["payment_successful"];
-							if (isset($_SESSION["confirmation_id"])) echo $_SESSION["confirmation_id"];
-							if (isset($_SESSION["payment_error"])) echo $_SESSION["payment_error"];
+							if ($row_address[6] != ""){ // Only display the second street address if this exists
+								$line_text .= $row_address[5] . ", ";
+							}
+							$line_text .= $row_address[7] . ", " . $row_address[8] . ", " . $row_address[9] . ", " . $row_address[10];
+							
+							$line_selector = "<input type = 'radio' name = 'shipping_address' value = " . $row_address[0]; // Format the radio button
+							if ($row_address[0] == $selected_shipping_address){ // If this is selected value, mark it as checked
+								$line_selector .= " checked";
+							}
+							$line_selector .= " onclick='displayShippingCountry(\"" . $row_address[10] ."\")' >" . $line_text . "<br />";
+							
+							echo($line_selector); // Display the formatted address value
+							echo("<br />");
+							
 						}
 					?>
-				</form>
+					
+					<a href="http://35.201.5.30/COMP344/"><button>Update addresses</button></a> <!-- link is to registration subsystem -->
+					
 				</div>
-				</div>
+			
+				<div class = "column">
+				
+					<div id = "shipping_choice" float="center">
+						<h2>Select Shipping Method:</h2>
+						<input type = 'radio' name = 'shipping_type' value = "Standard" <?php if ($selected_shipping_type == 'Standard')echo(" checked='true'"); ?>>Standard<br />
+						<input type = 'radio' name = 'shipping_type' value = "Express" <?php if ($selected_shipping_type == 'Express')echo(" checked='true' "); ?>>Express<br />
+					</div>
+					
 				<br />
+				
+				<div id = "shipping_button">
+					<input type='submit' name='Submit' value='Update Shipping Information' /><br /><br />
+				</div>
+				
+				<b>Shipping To:</b> <?php echo($order_address[3] . ' ' . $order_address[4] . ', ' . $order_address[5] . ' ' . $order_address[6] . ', ' . $order_address[7]); ?>
+				<br />
+				<b>Shipping Method:</b> <?php echo($selected_shipping_type); ?>
+				<br />
+				<br />
+			</div>
+		</form> 
+			
+		<div class = "column">
+		
+			<h2>Payment Information:</h2>
+			
+			<!-- JR added default test card. Remove when moving to prod.-->			
+			<form name="payment" action="paymentProcessor.php" method="post">
+				
+				<label for="cc_number">Credit Card Number:</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="text" id="cc_number" name="cc_number" value = "4444333322221111" placeholder="1234567812345678"><br> 
+					
+				<label for="cc_expiry_month">Credit Card Expiry Month (MM):</label>
+				 <input type="text" id="cc_expiry_month" name="cc_expiry_month" value= "09" placeholder="08"> <br>
+					
+				<label for="cc_expiry_year">Credit Card Expiry Year (YY):</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="text" id="cc_expiry_year" name="cc_expiry_year" value= "23" placeholder="17"><br>
+					
+				<label for="cc_ccv">Credit Card CCV:</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="text" id="cc_ccv" name="cc_ccv" value = "123" placeholder="123"><br>
+				<br />
+				
+				<input type="submit" value="Make Payment">
+				<a href="http://spider.science.mq.edu.au/mqauth/43715494/ass2/login/"><button>Return to Cart</button></a> <!-- link is to cart subsystem -->
+				
+				
+				<?php
+					global $debug;
+					$debug=false;
+					
+					if($debug)
+					{
+						if (isset($_SESSION["payment_successful"])) echo $_SESSION["payment_successful"];
+						if (isset($_SESSION["confirmation_id"])) echo $_SESSION["confirmation_id"];
+						if (isset($_SESSION["payment_error"])) echo $_SESSION["payment_error"];
+					}
+				?>
+				
+			</form>
+		</div>
+	</div>
+		
+	<br />
+	
 	<div id = "order">
-	
+
 	<table border = 1>
-	
 			<tr>
 				<?php 
 				$header_cart = array("Product", "Type", "Quantity", "Price", "Total"); // Headers for each of the columns
@@ -181,7 +190,7 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 				
 				} ?>
 			</tr>	
-			
+		
 			<?php 
 				while ($row_order = $query_order->fetch()){ // Iterate trough each row in the order
 					echo("<tr>");
@@ -192,18 +201,21 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 				};
 			?>
 
-			<tr > 
+			<tr> 
 				<td colspan = 4 align="right"><b>Subtotal: </b></td>
 				<td><?php echo($cost_subtotal) ?></td>
 			</tr>
+			
 			<tr>
 				<td colspan = 4 align="right"><b>GST: </b></td>
 				<td><?php echo($cost_gst) ?></td>
 			</tr>
+			
 			<tr>
 				<td colspan = 4 align="right"><b>Shipping: </b></td>
 				<td><?php echo($cost_shipping) ?></td>
 			</tr>
+			
 			<tr>
 				<td colspan = 4 align="right"><b>Total Cost: </b></td>
 				<td><?php echo($cost_total) ?></td>
@@ -211,10 +223,12 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 
 		</table>
 	</div>
-	<br>
-
-	</div>
 	
-  </body>
-  <footer id="footerAJAX"></footer>
+
+	<br />
+	<br />
+	<footer id="footerAJAX"></footer>
+	
+</body>
+
 </html>
