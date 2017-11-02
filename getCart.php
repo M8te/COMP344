@@ -138,8 +138,7 @@ function getAllCosts($order_id){
 
 	$query = 'select ORDER_SHIPPINGAMOUNT, ORDER_TAXAMOUNT, ORDER_PRODUCTAMOUNT, ORDER_TOTAL from "Order" where order_id = ' . $order_id;
 	$queryOutput = run_db_query($query); // Run query
-	
-	return $queryOutput;
+	return $queryOutput->fetch(); // Return first row as only a single row returned from query
 
 }
 

@@ -112,4 +112,11 @@ function updateOrderShippingType($shipping_type, $order){
 	run_db_query($query);
 }
 
+function queryEmail($shopper_pk){
+	$query = 'select sh_email from shopper where shopper_id = ' . $shopper_pk; 
+	$queryOutput = run_db_query($query); // Run query on DB and store result
+	$row  = $queryOutput -> fetch(); // Get the first value, as only one row returned by query	
+	return $row[0]; // Return the first value as only single string in output
+}
+
 ?>
