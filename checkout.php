@@ -1,14 +1,21 @@
 <?php
 session_start();  // start sessions 
 
-//TO CHANGE
-$order_id = 1; // Update to session order ID
-$_SESSION['order_id'] = $order_id;  
+// Check user is logged in before displaying page
+if(isset($_SESSION['user_id'])){
+	$current_user = $_SESSION['user_id']; // If login detected, display details for logged in user
+}
+else { // No login, Redirect to login page
+	header('Location: https://spider.science.mq.edu.au/mqauth/44542291/assignment2_stage2/login.php?error=not_loggedin'); 
+}
 
-
-$current_user = 8; // Update to session user
-$_SESSION['current_user']=$current_user;  
-//END TO CHANGE
+// Check user has an order before proceeding
+if(isset($_SESSION['order_id'])){
+	$order_id = $_SESSION['order_id']; // If login detected, display details for logged in user
+}
+else { // Redirect to login page for this assignment only. Would usually redirect to catalogue or whichever page was most appropriate
+	header('Location: https://spider.science.mq.edu.au/mqauth/44542291/assignment2_stage2/login.php?error=no_order'); 
+}
 
 
 
@@ -149,12 +156,42 @@ updateOrderCosts($order_id, $cost_shipping, $cost_gst, $cost_subtotal, $cost_tot
 				<label for="cc_number">Credit Card Number:</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<input type="text" id="cc_number" name="cc_number" value = "4444333322221111" placeholder="1234567812345678"><br> 
 					
+					
+				<label for="cc_expiry_month">Credit Card Expiry:</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<span>Month:</span>
+						<select id="cc_expiry_month" name="cc_expiry_month">
+							<option value="01">01</option>
+							<option value="02">02</option>
+							<option value="03" selected>03</option>
+							<option value="04">04</option>
+							<option value="05">05</option>
+							<option value="06">06</option>
+							<option value="07">07</option>
+							<option value="08">08</option>
+							<option value="09">09</option>
+							<option value="10">10</option>
+							<option value="11">11</option>
+							<option value="12">12</option>
+						</select>	
+		
+				<span>Year:</span>
+					<select id="cc_expiry_year" name="cc_expiry_year">
+						<option value="17">17</option>
+						<option value="18">18</option>
+						<option value="19">19</option>
+						<option value="20">20</option>
+						<option value="21">21</option>
+						<option value="22">22</option>
+						<option value="23" selected>23</option>
+					</select>
+				<!--
 				<label for="cc_expiry_month">Credit Card Expiry Month (MM):</label>
 				 <input type="text" id="cc_expiry_month" name="cc_expiry_month" value= "09" placeholder="08"> <br>
 					
 				<label for="cc_expiry_year">Credit Card Expiry Year (YY):</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<input type="text" id="cc_expiry_year" name="cc_expiry_year" value= "23" placeholder="17"><br>
-					
+				-->
+				<br />
 				<label for="cc_ccv">Credit Card CCV:</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<input type="text" id="cc_ccv" name="cc_ccv" value = "123" placeholder="123"><br>
 				<br />

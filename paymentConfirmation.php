@@ -1,19 +1,31 @@
 <?php
+
+session_start();  // start sessions 
+
+// Check user is logged in before displaying page
+if(isset($_SESSION['user_id'])){
+	$current_user = $_SESSION['user_id']; // If login detected, display details for logged in user
+}
+else { // No login, Redirect to login page
+	header('Location: https://spider.science.mq.edu.au/mqauth/44542291/assignment2_stage2/login.php?error=not_loggedin'); 
+}
+
+// Check user has an order before proceeding
+if(isset($_SESSION['order_id'])){
+	$order_id = $_SESSION['order_id']; // If login detected, display details for logged in user
+}
+else { // Redirect to login page for this assignment only. Would usually redirect to catalogue or whichever page was most appropriate
+	header('Location: https://spider.science.mq.edu.au/mqauth/44542291/assignment2_stage2/login.php?error=no_order'); 
+}
+
+
 // Files to reference
 include("config.php"); //Global config
 include("getCart.php"); // Used to get details realting to the cart
 include("getAddress.php"); // Used to get details relating to the users address
 
 
-session_start();
-// CHECK THIS
-//$_SESSION["confirmation_id"]= $confirmationid;
-//$_SESSION['order_id'] = $order_id;  //JR
-//$_SESSION['current_user']=$current_user;  //JR
-// CHECK
-
-$current_user = 8; // Update to session user
-$order_id = 1; // Update to session order ID
+// Data to display
 $invoice_costs = getAllCosts($order_id); // Costs
 $query_order = queryOrder($order_id); // Stores a list of items in users cart
 $order_address = querySpecificAddress(queryOrderAddress($order_id)); // Selected shipping values
