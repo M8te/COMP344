@@ -36,7 +36,7 @@ $users_email = queryEmail($current_user);
 
 
 $subject = "Account Registration";
-$txt = "Thank you for making a purchase with the Macqaurie Uni Bookshop. We hope you enjoy your purchase and come back to shop with us in the future. 
+$txt = "Thank you for making a purchase with the Macquarie Univesity Merchant Server. We hope you enjoy your purchase and come back to shop with us in the future. 
 Order number is: $order_id
 Name: $order_address[3] $order_address[4]
 Shipping Information:
@@ -96,7 +96,7 @@ mail($users_email,$subject,$txt,$headers); // Email invoice to user
 	<div id = "invoice_details" style="padding:10px;">
 			
 		<h1>Your order has been successfully placed!</h1>
-		<p><b>Thank you for shopping with Macquarie Uni Bookshop. Your order number is: #</b><?php echo($order_id); ?></p>
+		<p><b>Thank you for shopping with Macquarie University Merchant Server. Your order number is: #</b><?php echo($order_id); ?></p>
 
 		<p>An email has been sent to <?php echo($users_email); ?>. Your order will be sent to your <?php echo($order_address[2]); ?> address, listed below. We'll let you know once your item(s) have been dispatched with an estimated delivery time.</p>
 		
