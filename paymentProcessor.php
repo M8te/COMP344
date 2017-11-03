@@ -5,16 +5,25 @@ require_once ('getCart.php');
 
 global $debug;
 $debug = false;
-
-
-session_start();
 $error = false; //initiallize error variable
 
-//determine if user is logged in.
-if (!isset($_SESSION['current_user'])){ 
-	// Error as no user is logged in
-	$error = TRUE;
-	$_SESSION["payment_error"] = 'User has not been logged in.';
+
+session_start();  // start sessions 
+
+// Check user is logged in before displaying page
+if(isset($_SESSION['user_id'])){
+	$current_user = $_SESSION['user_id']; // If login detected, display details for logged in user
+}
+else { // No login, Redirect to login page
+	header('Location: https://spider.science.mq.edu.au/mqauth/44542291/assignment2_stage2/login.php?error=not_loggedin'); 
+}
+
+// Check user has an order before proceeding
+if(isset($_SESSION['order_id'])){
+	$order_id = $_SESSION['order_id']; // If login detected, display details for logged in user
+}
+else { // Redirect to login page for this assignment only. Would usually redirect to catalogue or whichever page was most appropriate
+	header('Location: https://spider.science.mq.edu.au/mqauth/44542291/assignment2_stage2/login.php?error=no_order'); 
 }
 
 
@@ -146,7 +155,7 @@ if ($debug) {
 	echo "cc no: " . $cc_no . "<br>";
 	echo "cc ccv: " . $cc_ccv . "<br>";
 	echo "cc exp " . $cc_exp . "<br>";
-	echo "current user: " . $_SESSION['current_user'] . "<br>";
+	echo "current user: " . $_SESSION['user_idr'] . "<br>";
 	echo "payment error (if any): " . $_SESSION["payment_error"] . "<br>";
 	echo "payment success?: " . $_SESSION["payment_successful"] . "<br>";
 	echo "Confirmation ID:" . $_SESSION["confirmation_id"] . "<br>";
