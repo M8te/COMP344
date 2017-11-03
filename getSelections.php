@@ -20,13 +20,6 @@ $orderShippingType = queryOrderShippingType($order_id);
 				return $get_shipping_type;
 			
 			}
-				// if so return
-				
-				// if not update then return
-				
-			
-			
-			 // Valid so return posted value
 		}
 	}
 

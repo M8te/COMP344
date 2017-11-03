@@ -34,26 +34,27 @@ function getPostageCost($selected_shipping_address, $order, $selected_shipping_t
 			$serviceType = 'INT_PARCEL_EXP_OWN_PACKAGING';
 		}
 	}
-
-	$itemDimensions = getItemDimensions($order);
-	$total_shipping_cost = 0;
 	
+	$itemDimensions = getItemDimensions($order); // Returns physical dimensions items in the cart and quantity
+	$total_shipping_cost = 0; // Tracks total cost
 	
-	while ($row_details = $itemDimensions->fetch()){
-		$rowQuantity = $row_details[0];
+	// Aus post API needs to be called for each item in cart. Therefore iterate through each row in cart, total order and increment total by this.
+	
+	while ($row_details = $itemDimensions->fetch()){ 
+	
+		$rowQuantity = $row_details[0]; // Place values in their own containers for ease of reference.
 		$lenghtCM = $row_details[5];
 		$widthCM = $row_details[6];
 		$heighCM = $row_details[7];
 		$weightKG = $row_details[4];
 		
-		$costs = new CalculateShipment();
-		$responseCode = $costs->determinecosts($fromPostcode, $toPostcode, $lenghtCM, $widthCM, $heighCM, $weightKG, $serviceType, $country);
-		$line_cost = $costs->getItemShipmentCost();
-		$total_shipping_cost = $total_shipping_cost + $line_cost;
+		$costs = new CalculateShipment(); // Create object used to call API
+		$responseCode = $costs->determinecosts($fromPostcode, $toPostcode, $lenghtCM, $widthCM, $heighCM, $weightKG, $serviceType, $country); // Get output from Auspost
+		$line_cost = $costs->getItemShipmentCost() * $row_details[1]; // Get the cost of item(s) on this row
+		$total_shipping_cost = $total_shipping_cost + $line_cost; // Update total cost with this row
 	}
 	
-	
-	return $total_shipping_cost;
+	return $total_shipping_cost; // Return total cost of all items iterated through
 
 }
 

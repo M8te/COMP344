@@ -10,12 +10,12 @@ else { // No login, Redirect to login page
 	header('Location: https://spider.science.mq.edu.au/mqauth/44542291/assignment2_stage2/login.php?error=not_loggedin'); 
 }
 
-// Check user has an order before proceeding
-if(isset($_SESSION['order_id'])){
-	$order_id = $_SESSION['order_id']; // If login detected, display details for logged in user
+// Check user has a completed order. This does not require order completed in session so a future version of system could load invoices for completed orders.
+if(isset($_SESSION['confirmation_id'])){
+	$order_id = $_SESSION['order_id']; // Use for getting order details from DB
 }
-else { // Redirect to login page for this assignment only. Would usually redirect to catalogue or whichever page was most appropriate
-	header('Location: https://spider.science.mq.edu.au/mqauth/44542291/assignment2_stage2/login.php?error=no_order'); 
+else { // Redirect to checkout as checkout not yet completed
+	header('Location: checkout.php'); 
 }
 
 
@@ -30,11 +30,13 @@ $invoice_costs = getAllCosts($order_id); // Costs
 $query_order = queryOrder($order_id); // Stores a list of items in users cart
 $order_address = querySpecificAddress(queryOrderAddress($order_id)); // Selected shipping values
 
+// Gather details for sending user an email invoice
+$users_email = queryEmail($current_user);
 
-	$users_email = queryEmail($current_user);
-	$email = "ben.woods@students.mq.edu.au";
-	$subject = "Account Registration";
-	$txt = "Thank you for making a purchase with the Macqaurie Uni Bookshop. We hope you enjoy your purchase and come back to shop with us in the future. 
+
+
+$subject = "Account Registration";
+$txt = "Thank you for making a purchase with the Macqaurie Uni Bookshop. We hope you enjoy your purchase and come back to shop with us in the future. 
 Order number is: $order_id
 Name: $order_address[3] $order_address[4]
 Shipping Information:
@@ -49,9 +51,9 @@ GST: $$invoice_costs[1]
 Shipping: $$invoice_costs[0]
 Total Cost: $$invoice_costs[3]
 ";
-	$headers = "From: NO-REPLY@BOOKSHOP.COM";  
-	mail($email,$subject,$txt,$headers);
-	
+
+$headers = "From: NO-REPLY@BOOKSHOP.COM";  
+mail($users_email,$subject,$txt,$headers); // Email invoice to user
 	
 ?>
 
