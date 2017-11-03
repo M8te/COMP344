@@ -7,8 +7,8 @@ $dbloc = "mq"; // Use "local", "mq" or add others as appropriate
 if ($dbloc == "mq") {
 	$dbhost = 'animatrix.science.mq.edu.au';
 	$sid = "one";
-	$dbusername = '';
-	$dbuserpassword = '';
+	$dbusername = ''; //Fill in
+	$dbuserpassword = ''; // Fill in
 	$oraDB  = "(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=animatrix.science.mq.edu.au)";
 	$oraDB .= "(PORT=1521)))(CONNECT_DATA=(SID=one)))";
 }
